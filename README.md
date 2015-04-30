@@ -25,7 +25,7 @@ E.g. on a Debian system, as root :
 ```bash
 # install the Python development stuff
 apt-get install python-dev
-# install the ICAP API
+# install the C-ICAP API
 apt-get install libicapapi-dev
 ```
 

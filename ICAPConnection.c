@@ -178,7 +178,12 @@ py_conn_write(void *ctx, char *buf, int len)
 
     if(sio != NULL)
     {
+	PyGILState_STATE gstate;
+
+	// reacquire the GIL to execute the Python cStringIO code
+	gstate = PyGILState_Ensure();
 	ret = PycStringIO_ref->cwrite(sio, buf, len);
+	PyGILState_Release(gstate);
     }
 
     return ret;
@@ -225,8 +230,13 @@ py_conn_build_reqmod_http_headers(char const *url)
 static int
 py_conn_fill_server_options(ci_request_t *req, int timeout)
 {
-    int ret = ci_client_get_server_options(req, timeout);
-    if(ret == CI_OK)
+    int ret = CI_OK;
+    
+    Py_BEGIN_ALLOW_THREADS
+    ret = ci_client_get_server_options(req, timeout);
+    Py_END_ALLOW_THREADS
+    
+    if(ret != CI_ERROR)
     {
 	// save the retrieved  values;
 	int preview = req->preview;
@@ -346,10 +356,12 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 	conn->content = PycStringIO_ref->NewOutput(128);
     }
 
+    Py_BEGIN_ALLOW_THREADS
     ret = ci_client_icapfilter(conn->req, timeout,
 			       req_headers, resp_headers, 
 			       &input_fd, py_conn_read,
 			       conn->content, py_conn_write);
+    Py_END_ALLOW_THREADS
     if(ret == CI_ERROR)
     {
 	PyErr_SetString(PyICAP_Exc, "Cannot send the ICAP request");
