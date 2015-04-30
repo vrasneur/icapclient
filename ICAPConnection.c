@@ -222,6 +222,29 @@ py_conn_build_reqmod_http_headers(char const *url)
     return req_headers;
 }
 
+static int
+py_conn_fill_server_options(ci_request_t *req, int timeout)
+{
+    int ret = ci_client_get_server_options(req, timeout);
+    if(ret == CI_OK)
+    {
+	// save the retrieved  values;
+	int preview = req->preview;
+	int allow204 = req->allow204;
+	int allow206 = req->allow206;
+	int keepalive = req->keepalive;
+	// reuse the old OPTIONS request
+	ci_client_request_reuse(req);
+	// copy the saved values
+	req->preview = preview;
+	req->allow204 = allow204;
+	req->allow206 = allow206;
+	req->keepalive = keepalive;
+    }
+    
+    return ret;
+}
+
 static PyObject *
 py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 {
@@ -289,10 +312,16 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 	goto py_conn_request_error;
     }
    
-    ci_client_get_server_options(conn->req, timeout);
-    ci_client_request_reuse(conn->req);
-    conn->req->type = (strcmp(type, "REQMOD") == 0) ? ICAP_REQMOD : ICAP_RESPMOD;
+    int ret = py_conn_fill_server_options(conn->req, timeout);
+    if(ret == CI_ERROR)
+    {
+	PyErr_SetString(PyICAP_Exc, "Cannot send the ICAP OPTIONS request");
+      
+	goto py_conn_request_error;	
+    }
 
+    conn->req->type = (strcmp(type, "REQMOD") == 0) ? ICAP_REQMOD : ICAP_RESPMOD;
+    
     req_headers = py_conn_build_reqmod_http_headers(url);
     if(req_headers == NULL)
     {
@@ -317,10 +346,10 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 	conn->content = PycStringIO_ref->NewOutput(128);
     }
 
-    int ret = ci_client_icapfilter(conn->req, timeout,
-				   req_headers, resp_headers, 
-				   &input_fd, py_conn_read,
-				   conn->content, py_conn_write);
+    ret = ci_client_icapfilter(conn->req, timeout,
+			       req_headers, resp_headers, 
+			       &input_fd, py_conn_read,
+			       conn->content, py_conn_write);
     if(ret == CI_ERROR)
     {
 	PyErr_SetString(PyICAP_Exc, "Cannot send the ICAP request");

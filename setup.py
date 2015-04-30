@@ -16,7 +16,7 @@ ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 
                 extra_link_args=extra_link_args)
 
 setup(name='icapclient',
-      version='1.0',
+      version='1.0.0',
       description='Python module for creating ICAP clients',
       author='Vincent Rasneur',
       author_email='vrasneur@free.fr',
