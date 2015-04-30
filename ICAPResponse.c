@@ -129,7 +129,7 @@ py_resp_parse_http_req_headers(PyICAPResponse *resp, ci_request_t *req)
       
 	ci_headers_iterate(req_headers, &ctx, py_resp_add_header);
 	resp->http_req_line = ctx.line;
-	resp->http_resp_line = ctx.headers;
+	resp->http_req_headers = ctx.headers;
     }
 }
 
