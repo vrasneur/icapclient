@@ -15,11 +15,17 @@ ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 
                 extra_compile_args=extra_compile_args,
                 extra_link_args=extra_link_args)
 
-setup(name='icapclient',
-      version='1.0.0',
+name_str = 'icapclient'
+version_str = '1.0.0'
+url_str = 'https://github.com/vrasneur/%s' % name_str
+tarball_str = '%s/tarball/%s' % (url_str, version_str)
+
+setup(name=name_str,
+      version=version_str,
       description='Python module for creating ICAP clients',
       author='Vincent Rasneur',
       author_email='vrasneur@free.fr',
-      url='https://github.com/vrasneur/icapclient',
+      url=url_str,
+      download_url=tarball_str,
       keywords=['icap', 'antivirus'],
       ext_modules=[ext])
