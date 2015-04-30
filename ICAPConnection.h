@@ -22,6 +22,12 @@
 #include <c_icap/request.h>
 #include <c_icap/simple_api.h>
 
+// C-ICAP does not have a macro that defines the library version
+// so, we rely on a macro only defined in recent versions...
+#ifndef ci_allow206 
+#define OLD_CICAP_VERSION
+#endif
+
 typedef struct
 {
     PyObject_HEAD
@@ -30,6 +36,7 @@ typedef struct
     int proto;
     ci_connection_t *conn;
     ci_request_t *req;
+    int req_status;
     PyObject *content;
 } PyICAPConnection;
 

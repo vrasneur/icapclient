@@ -30,6 +30,36 @@ typedef struct
     size_t idx;
 } py_resp_headers_ctx;
 
+// if the header iteration function is not defined
+// just copy-paste the code from a recent C-ICAP version
+#ifdef OLD_CICAP_VERSION
+#define eoh(s) ((*s == '\r' && *(s+1) == '\n' && *(s+2) != '\t' && *(s+2) != ' ') || (*s == '\n' && *(s+1) != '\t' && *(s+1) != ' '))
+
+static int ci_headers_iterate(ci_headers_list_t * h, void *data, void (*fn)(void *, const char  *head, const char  *value))
+{
+    char header[256];
+    char value[8124];
+    char *s;
+    int i, j;
+    for (i = 0; i < h->used; i++) {
+        s = h->headers[i];
+        for (j = 0;  j < sizeof(header)-1 && *s != ':' &&  *s != '\0' && *s != '\r' && *s!='\n'; s++, j++)
+            header[j] = *s;
+        header[j] = '\0';
+        j = 0;
+        if (*s == ':') {
+            s++;
+            while (*s == ' ') s++;
+            for (j = 0;  j < sizeof(value)-1 &&  *s != '\0' && !eoh(s); s++, j++)
+                value[j] = *s;
+        }
+        value[j] = '\0';
+        fn(data, header, value);
+    }
+    return 1;
+}
+#endif
+
 static void
 py_resp_add_header(void *data, char const *name, char const *value)
 {
@@ -58,14 +88,24 @@ py_resp_add_header(void *data, char const *name, char const *value)
 }
 
 static int
-py_resp_parse_icap_headers(PyICAPResponse *resp, ci_request_t *req)
+py_resp_parse_icap_headers(PyICAPResponse *resp, PyICAPConnection const *conn)
 {
     py_resp_headers_ctx ctx = { 0 };
-    ci_headers_list_t *icap_headers = req->response_header;
+    ci_headers_list_t *icap_headers = conn->req->response_header;
    
     if(icap_headers == NULL || icap_headers->used <= 0)
     {
-	PyErr_SetString(PyICAP_Exc, "No ICAP response line found");
+	// old versions of C-ICAP delete the headers
+	// if we receive a 204 response...
+	if(conn->req_status == 204)
+	{
+	    resp->icap_status = PyInt_FromLong(conn->req_status);
+	    resp->icap_reason = PyString_FromString("Unmodified");
+	}
+	else
+	{
+	    PyErr_SetString(PyICAP_Exc, "No ICAP response line found");
+	}
      
 	goto py_resp_parse_icap_headers_error;
     }
@@ -149,14 +189,14 @@ py_resp_parse_http_resp_headers(PyICAPResponse *resp, ci_request_t *req)
 }
 
 static int
-py_resp_parse_headers(PyICAPResponse *resp, ci_request_t *req)
+py_resp_parse_headers(PyICAPResponse *resp, PyICAPConnection const *conn)
 {
-    int ret = py_resp_parse_icap_headers(resp, req);
+    int ret = py_resp_parse_icap_headers(resp, conn);
 
     if(ret == 0)
     {
-	py_resp_parse_http_req_headers(resp, req);
-	py_resp_parse_http_resp_headers(resp, req);
+	py_resp_parse_http_req_headers(resp, conn->req);
+	py_resp_parse_http_resp_headers(resp, conn->req);
     }
    
     return ret;
@@ -187,7 +227,7 @@ PyObject *py_resp_new(PyICAPConnection *conn)
     // set all the custom attributes to NULL
     py_resp_init(resp);
    
-    int ret = py_resp_parse_headers(resp, conn->req);
+    int ret = py_resp_parse_headers(resp, conn);
     if(ret != 0)
     {
 	Py_XDECREF(resp);

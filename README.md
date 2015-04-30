@@ -12,7 +12,7 @@ Requirements
 
 * Python 2.6 or 2.7
 * the [C-ICAP](http://c-icap.sourceforge.net) library, tested on
-  versions 0.3.4 and 0.3.5
+  versions 0.1.6, 0.3.4 and 0.3.5
 * GCC or clang
 
 Installation

@@ -104,6 +104,8 @@ py_conn_free_req(PyICAPConnection *conn)
 
     ci_request_destroy(conn->req), conn->req = NULL;
 
+    conn->req_status = 0;
+
     // destroy the response content too
     if(conn->content != NULL)
     {
@@ -241,14 +243,18 @@ py_conn_fill_server_options(ci_request_t *req, int timeout)
 	// save the retrieved  values;
 	int preview = req->preview;
 	int allow204 = req->allow204;
+#ifndef OLD_CICAP_VERSION
 	int allow206 = req->allow206;
+#endif
 	int keepalive = req->keepalive;
 	// reuse the old OPTIONS request
 	ci_client_request_reuse(req);
 	// copy the saved values
 	req->preview = preview;
 	req->allow204 = allow204;
+#ifndef OLD_CICAP_VERSION
 	req->allow206 = allow206;
+#endif
 	req->keepalive = keepalive;
     }
     
@@ -358,7 +364,11 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 
     Py_BEGIN_ALLOW_THREADS
     ret = ci_client_icapfilter(conn->req, timeout,
-			       req_headers, resp_headers, 
+#ifdef OLD_CICAP_VERSION
+			       (conn->req->type == ICAP_REQMOD) ? req_headers : resp_headers,
+#else
+			       req_headers, resp_headers,
+#endif
 			       &input_fd, py_conn_read,
 			       conn->content, py_conn_write);
     Py_END_ALLOW_THREADS
@@ -369,8 +379,10 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 	goto py_conn_request_error;
     }
 
+    conn->req_status = ret;
+
 py_conn_request_error:
-   
+
     if(req_headers != NULL)
     {
 	ci_headers_destroy(req_headers), req_headers = NULL;
