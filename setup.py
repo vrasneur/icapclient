@@ -19,7 +19,7 @@ extra_compile_args.extend(check_output([api_config, '--cflags']).split())
 
 extra_link_args = check_output([api_config, '--libs']).split()
 
-ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 'ICAPResponse.c'],
+ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 'ICAPResponse.c', 'cicap_compat.c'],
                 extra_compile_args=extra_compile_args,
                 extra_link_args=extra_link_args)
 

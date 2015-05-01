@@ -14,25 +14,24 @@
  *   more details.
  */
 
-#ifndef PY_ICAP_CONNECTION_H
-#define PY_ICAP_CONNECTION_H
+#ifndef PY_ICAP_COMPAT_H
+#define PY_ICAP_COMPAT_H
 
-#include <Python.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+#include <header.h>
+#include <request.h>
+#include <simple_api.h>
+#pragma GCC diagnostic pop
 
-#include "cicap_compat.h"
+// C-ICAP does not have a macro that defines the library version
+// so, we rely on a macro only defined in recent versions...
+#ifndef ci_allow206 
+#define OLD_CICAP_VERSION
+#endif
 
-typedef struct
-{
-    PyObject_HEAD
-    char *host;
-    int port;
-    int proto;
-    ci_connection_t *conn;
-    ci_request_t *req;
-    int req_status;
-    PyObject *content;
-} PyICAPConnection;
+#ifdef OLD_CICAP_VERSION
+int ci_headers_iterate(ci_headers_list_t * h, void *data, void (*fn)(void *, const char  *head, const char  *value));
+#endif
 
-PyTypeObject PyICAPConnectionType;
-
-#endif // PY_ICAP_CONNECTION_H
+#endif // PY_ICAP_COMPAT_H

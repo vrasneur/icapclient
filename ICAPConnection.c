@@ -19,6 +19,7 @@
 #include <cStringIO.h>
 
 #include "gcc_attributes.h"
+#include "cicap_compat.h"
 #include "ICAPResponse.h"
 
 // cStringIO module

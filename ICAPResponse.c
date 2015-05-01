@@ -19,6 +19,7 @@
 #include <structmember.h>
 
 #include "gcc_attributes.h"
+#include "cicap_compat.h"
 
 // default exception
 extern PyObject *PyICAP_Exc;
@@ -29,36 +30,6 @@ typedef struct
     PyObject *headers;
     size_t idx;
 } py_resp_headers_ctx;
-
-// if the header iteration function is not defined
-// just copy-paste the code from a recent C-ICAP version
-#ifdef OLD_CICAP_VERSION
-#define eoh(s) ((*s == '\r' && *(s+1) == '\n' && *(s+2) != '\t' && *(s+2) != ' ') || (*s == '\n' && *(s+1) != '\t' && *(s+1) != ' '))
-
-static int ci_headers_iterate(ci_headers_list_t * h, void *data, void (*fn)(void *, const char  *head, const char  *value))
-{
-    char header[256];
-    char value[8124];
-    char *s;
-    int i, j;
-    for (i = 0; i < h->used; i++) {
-        s = h->headers[i];
-        for (j = 0;  j < sizeof(header)-1 && *s != ':' &&  *s != '\0' && *s != '\r' && *s!='\n'; s++, j++)
-            header[j] = *s;
-        header[j] = '\0';
-        j = 0;
-        if (*s == ':') {
-            s++;
-            while (*s == ' ') s++;
-            for (j = 0;  j < sizeof(value)-1 &&  *s != '\0' && !eoh(s); s++, j++)
-                value[j] = *s;
-        }
-        value[j] = '\0';
-        fn(data, header, value);
-    }
-    return 1;
-}
-#endif
 
 static void
 py_resp_add_header(void *data, char const *name, char const *value)
@@ -255,6 +226,14 @@ py_resp_get_header(PyObject *headers, char const *name)
 	for(Py_ssize_t idx = 0; idx < len; idx++)
 	{
 	    PyObject *py_header = PyList_GET_ITEM(headers, idx);
+
+	    // not a good (name, value) header?
+	    if(py_header == NULL || !PyTuple_Check(py_header) ||
+	       PyTuple_GET_SIZE(py_header) != 2)
+	    {
+		continue;
+	    }
+	    
 	    PyObject *py_name = PyTuple_GET_ITEM(py_header, 0);
 	    char const *header_name = PyString_AS_STRING(py_name);
 
