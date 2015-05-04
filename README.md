@@ -7,6 +7,15 @@ The module API is somewhat inspired by the [httplib](https://docs.python.org/2/l
 This module is written in pure C, and uses the C-ICAP library to
 handle the ICAP protocol.
 
+What is an ICAP client?
+---
+
+ICAP is a protocol defined in [RFC3507](http://tools.ietf.org/html/rfc3507). [Errata](http://www.measurement-factory.com/std/icap/) are available for the ICAP specification and there is a draft RFC about [ICAP extensions](https://tools.ietf.org/html/draft-stecher-icap-subid-00).
+
+It is a client-server protocol that is primarily used to do virus scanning and content rewriting. E.g. an ICAP client sends a potentially infected file to the ICAP server. This server does some analysis and sends back information about the file to the client, such as the detected virus name. Or a proxy can send content to an ICAP server that will modify the content and send it back to the proxy.
+
+ICAP is implemented by many antivirus gateways or web proxies. You have a list of implementations in the [Wikipedia article about ICAP](http://en.wikipedia.org/wiki/Internet_Content_Adaptation_Protocol) or at the [ICAP-forum Products page](http://www.icap-forum.org/icap?do=products).
+
 Requirements
 ---
 
@@ -44,6 +53,8 @@ python setup.py install
 
 Example
 ---
+
+To send files and get the ICAP server response
 
 ```python
 # import the icap client library
@@ -118,4 +129,12 @@ Example
 True
 # close the ICAP connection
 >>> conn.close()
+```
+
+To enable the verbose mode
+
+```python
+>>> import icapclient
+>>> icapclient.set_debug_stdout(True)
+>>> icapclient.set_debug_level(10)
 ```

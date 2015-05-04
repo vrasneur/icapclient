@@ -226,7 +226,6 @@ py_resp_get_header(PyObject *headers, char const *name)
 	for(Py_ssize_t idx = 0; idx < len; idx++)
 	{
 	    PyObject *py_header = PyList_GET_ITEM(headers, idx);
-
 	    // not a good (name, value) header?
 	    if(py_header == NULL || !PyTuple_Check(py_header) ||
 	       PyTuple_GET_SIZE(py_header) != 2)
@@ -235,8 +234,13 @@ py_resp_get_header(PyObject *headers, char const *name)
 	    }
 	    
 	    PyObject *py_name = PyTuple_GET_ITEM(py_header, 0);
-	    char const *header_name = PyString_AS_STRING(py_name);
+	    // not a good header key?
+	    if(py_name == NULL || !PyString_Check(py_name))
+	    {
+		continue;
+	    }
 
+	    char const *header_name = PyString_AS_STRING(py_name);
 	    if(header_name != NULL && strcasecmp(header_name, name) == 0)
 	    {
 		PyObject *py_value = PyTuple_GET_ITEM(py_header, 1);
