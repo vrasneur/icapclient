@@ -40,11 +40,14 @@ py_conn_new(PyTypeObject *type, GCC_UNUSED PyObject *args, GCC_UNUSED PyObject *
     PyObject *self = type->tp_alloc(type, 0);
     PyICAPConnection *conn = (PyICAPConnection *)self;
 
+    // should already be set to 0 by the alloc call
     conn->host = NULL;
     conn->port = 0;
     conn->proto = 0;
     conn->conn = NULL;
     conn->req = NULL;
+    conn->req_status = 0;
+    conn->content = NULL;
 
     return self;
 }
@@ -360,6 +363,8 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 
     if(read_content)
     {
+	// inhibit an "unused" warning
+	(void)PycStringIO;
 	conn->content = PycStringIO_ref->NewOutput(128);
     }
 
