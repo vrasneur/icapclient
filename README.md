@@ -29,27 +29,27 @@ Installation
 
 1. Install all the required development packages.
 
-E.g. on a Debian system, as root :
+   E.g. on a Debian system, as root :
 
-```bash
-# install the Python development stuff
-apt-get install python-dev
-# install the C-ICAP API
-apt-get install libicapapi-dev
-```
+   ```bash
+   # install the Python development stuff
+   apt-get install python-dev
+   # install the C-ICAP API
+   apt-get install libicapapi-dev
+   ```
 
 2. Build the library, as a normal user
 
-```bash
-cd /path/to/icapclient
-python setup.py build
-```
+   ```bash
+   cd /path/to/icapclient
+   python setup.py build
+   ```
 
 3. Install the library, as root
 
-```bash
-python setup.py install
-```
+   ```bash
+   python setup.py install
+   ```
 
 Example
 ---
@@ -98,7 +98,8 @@ To send files and get the ICAP server response
 # get the ICAP response
 >>> resp = conn.getresponse()
 # the response is OK
->>> resp.icap_status200
+>>> resp.icap_status
+200
 >>> resp.icap_reason
 'OK'
 # pretty-print the ICAP response headers
@@ -116,7 +117,8 @@ To send files and get the ICAP server response
 # try a REQMOD request with a file with no malware in it
 >>> conn.request('REQMOD', '/home/vincent/files/normal.txt')
 >>> resp = conn.getresponse()
->>> resp.icap_status200
+>>> resp.icap_status
+200
 >>> resp.icap_reason
 'OK'
 >>> pprint(resp.icap_headers)
