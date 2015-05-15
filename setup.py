@@ -24,7 +24,7 @@ ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 
                 extra_link_args=extra_link_args)
 
 name_str = 'icapclient'
-version_str = '1.0.2'
+version_str = '1.0.3'
 url_str = 'https://github.com/vrasneur/%s' % name_str
 tarball_str = '%s/tarball/%s' % (url_str, version_str)
 
