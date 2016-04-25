@@ -65,7 +65,8 @@ To send files and get the ICAP server response
 >>> conn = icapclient.ICAPConnection('192.168.1.5')
 # check that the ICAP server recognizes the EICAR virus test file
 # send a REQMOD request, default url is '/' and default service is 'avscan'
->>> conn.request('REQMOD', '/home/vincent/malwares/eicar.txt')
+# specify another service explicitly if you are using "eset" for example
+>>> conn.request('REQMOD', '/home/vincent/malwares/eicar.txt', service="avscan")
 # get the server response
 >>> resp = conn.getresponse()
 # get the ICAP response status code
