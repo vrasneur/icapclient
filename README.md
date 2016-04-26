@@ -85,9 +85,9 @@ To send files and get the ICAP server response
  ('Encapsulated', 'res-hdr=0, res-body=108')]
 # get a specific header value
 # here, check if a virus has been found
-# Note that "x-infection-found" is a draft and not all antivirues implement it.
+# Note that "x-infection-found" is a draft and not all antiviruses implement it.
 # For example, Eset NOT 32 does not.
-# Sometimes you should look inside the incapsulated HTTP-response.
+# Sometimes you should look inside the incapsulated HTTP response.
 >>> resp.get_icap_header('x-infection-found')
 'Type=0; Resolution=2; Threat=Eicar-Test-Signature;'
 # get the first line of the encapsulated HTTP request
