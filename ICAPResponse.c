@@ -37,9 +37,9 @@ py_resp_add_header(void *data, char const *name, char const *value)
     py_resp_headers_ctx *ctx = data;
 
     if(ctx->idx == 0 &&
-       (value == NULL || *value == '\0'))
+       (name == NULL || *name == '\0'))
     {
-	ctx->line = PyString_FromString(name);
+	ctx->line = PyString_FromString(value);
     }
     else
     {
