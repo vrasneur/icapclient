@@ -15,18 +15,15 @@
  */
 
 #include <Python.h>
-#include <cStringIO.h>
-
 #include <debug.h>
 
 #include "gcc_attributes.h"
 #include "ICAPConnection.h"
 #include "ICAPResponse.h"
 
-// PycStringIO is static, use a non-static variable
-struct PycStringIO_CAPI *PycStringIO_ref = NULL;
-
 static char icapclient_doc[] = "Provide bindings to the C-ICAP library (Client only)";
+
+PyObject* Python3IO = NULL;
 
 // ICAP exception
 PyObject *PyICAP_Exc = NULL;
@@ -38,11 +35,11 @@ icapclient_debug_level(GCC_UNUSED PyObject *obj, PyObject *args)
 
     if(!PyArg_ParseTuple(args, "i", &debug_level))
     {
-	return NULL;
+        return NULL;
     }
 
     CI_DEBUG_LEVEL = debug_level;
-  
+
     Py_RETURN_NONE;
 }
 
@@ -53,7 +50,7 @@ icapclient_debug_stdout(GCC_UNUSED PyObject *obj, PyObject *args)
 
     if(!PyArg_ParseTuple(args, "i", &debug_stdout))
     {
-	return NULL;
+        return NULL;
     }
 
     CI_DEBUG_STDOUT = debug_stdout;
@@ -73,24 +70,41 @@ static struct PyMethodDef icapclient_methods[] =
 // C-ICAP default cflags include "-fvisibility=hidden"
 GCC_STD_DEFAULT
 PyMODINIT_FUNC
-initicapclient(void)
+PyInit_icapclient(void)
 {
     PyObject *icapclient_module = NULL;
 
     if(PyType_Ready(&PyICAPConnectionType) < 0)
     {
-	return;
+        return NULL;
     }
 
     if(PyType_Ready(&PyICAPResponseType) < 0)
     {
-	return;
+        return NULL;
     }
-   
-    icapclient_module = Py_InitModule3("icapclient", icapclient_methods, icapclient_doc);
+
+    struct module_state {
+        PyObject *error;
+    };
+
+    static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "icapclient",     /* m_name */
+        icapclient_doc,  /* m_doc */
+        sizeof(struct module_state),  /* m_size */
+        icapclient_methods,    /* m_methods */
+        NULL,                /* m_reload */
+        NULL,                /* m_traverse */
+        NULL,                /* m_clear */
+        NULL,                /* m_free */
+    };
+
+    icapclient_module = PyModule_Create(&moduledef);
+
     if(icapclient_module == NULL)
     {
-	return;
+        return NULL;
     }
 
     // some constants for the ICAPConnection object
@@ -101,7 +115,7 @@ initicapclient(void)
     PyICAP_Exc = PyErr_NewException("icapclient.ICAPException", PyExc_IOError, NULL);
     if(PyICAP_Exc == NULL)
     {
-	return;
+        return NULL;
     }
 
     Py_INCREF(PyICAP_Exc);
@@ -112,8 +126,9 @@ initicapclient(void)
     PyModule_AddObject(icapclient_module, "ICAPConnection", (PyObject *)&PyICAPConnectionType);
     Py_INCREF(&PyICAPResponseType);
     PyModule_AddObject(icapclient_module, "ICAPResponse", (PyObject *)&PyICAPResponseType);
-   
-    // import the cStringIO module
-    PycString_IMPORT;
-    PycStringIO_ref = PycStringIO;
+
+    // Populate IO module
+    Python3IO = PyImport_ImportModule("io");
+
+    return icapclient_module;
 }
