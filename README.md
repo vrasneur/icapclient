@@ -1,7 +1,7 @@
-icapclient
+icapclient3
 ===
 
-A Python module for creating ICAP clients.
+A Python3 module for creating ICAP clients. This is a fork of https://github.com/vrasneur/icapclient with Python3.X support.
 The module API is somewhat inspired by the [httplib](https://docs.python.org/2/library/httplib.html) python module.
 
 This module is written in pure C, and uses the C-ICAP library to
@@ -19,7 +19,7 @@ ICAP is implemented by many antivirus gateways or web proxies. You have a list o
 Requirements
 ---
 
-* Python 2.6 or 2.7
+* Python 3.X
 * the [C-ICAP](http://c-icap.sourceforge.net) library, tested on
   versions 0.1.6, 0.3.4 and 0.3.5
 * GCC or clang
