@@ -3,6 +3,7 @@ ICAPConnection.c
 ICAPConnection.h
 ICAPResponse.c
 ICAPResponse.h
+README.rst
 cicap_compat.c
 cicap_compat.h
 gcc_attributes.h
