@@ -170,14 +170,15 @@ py_conn_write(void *ctx, char *buf, int len)
 {
     int ret = len;
     int *fd = ctx;
+    PyObject *byteObj;
 
     if(fd != NULL)
     {
-    PyGILState_STATE gstate;
-
-    gstate = PyGILState_Ensure();
-    ret = write(*fd, buf, len);
-    PyGILState_Release(gstate);
+        PyGILState_STATE gstate;
+        gstate = PyGILState_Ensure();
+        byteObj = PyBytes_FromStringAndSize(buf, len);
+        PyObject_CallMethod(ctx, "write", "O", byteObj);
+        PyGILState_Release(gstate);
     }
 
     return ret;
