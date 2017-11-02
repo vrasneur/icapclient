@@ -20,7 +20,7 @@ def read(fname):
 if not find_executable(api_config):
     raise OSError('Cannot find the "%s" command' % api_config)
 
-extra_compile_args = ['-std=gnu99', '-Wextra', '-DDEBUG']
+extra_compile_args = ['-std=gnu99', '-Wextra']
 extra_compile_args.extend(check_output([api_config, '--cflags']).decode('utf-8').split())
 extra_link_args = check_output([api_config, '--libs']).decode('utf-8').split()
 
@@ -29,7 +29,7 @@ ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 
                 extra_link_args=extra_link_args)
 
 name_str = 'icapclient3'
-version_str = '1.0.4'
+version_str = '1.0.5'
 url_str = 'https://github.com/fim/%s' % name_str
 tarball_str = '%s/tarball/%s' % (url_str, version_str)
 
