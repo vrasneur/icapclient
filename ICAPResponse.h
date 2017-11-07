@@ -34,7 +34,7 @@ typedef struct
     PyObject *content;
 } PyICAPResponse;
 
-PyTypeObject PyICAPResponseType;
+extern PyTypeObject PyICAPResponseType;
 
 PyObject *py_resp_new(PyICAPConnection *conn);
 

@@ -24,6 +24,8 @@
 static char icapclient_doc[] = "Provide bindings to the C-ICAP library (Client only)";
 
 PyObject* Python3IO = NULL;
+extern PyTypeObject PyICAPResponseType;
+extern PyTypeObject PyICAPConnectionType;
 
 // ICAP exception
 PyObject *PyICAP_Exc = NULL;

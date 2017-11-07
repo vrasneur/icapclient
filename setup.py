@@ -29,7 +29,7 @@ ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 
                 extra_link_args=extra_link_args)
 
 name_str = 'icapclient3'
-version_str = '1.0.6'
+version_str = '1.0.7'
 url_str = 'https://github.com/fim/%s' % name_str
 tarball_str = '%s/tarball/%s' % (url_str, version_str)
 

@@ -20,6 +20,7 @@
 #include <Python.h>
 
 #include "cicap_compat.h"
+extern PyObject *Python3IO;
 
 typedef struct
 {
@@ -33,6 +34,6 @@ typedef struct
     PyObject *content;
 } PyICAPConnection;
 
-PyTypeObject PyICAPConnectionType;
+extern PyTypeObject PyICAPConnectionType;
 
 #endif // PY_ICAP_CONNECTION_H
