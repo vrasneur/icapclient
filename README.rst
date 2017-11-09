@@ -8,6 +8,9 @@ module API is somewhat inspired by the `httplib`_ python module.
 This module is written in pure C, and uses the C-ICAP library to handle
 the ICAP protocol.
 
+This branch works with the latest versions of C-ICAP (0.4.x - 0.5.x). If you
+are using an older version, check the legacy branch.
+
 What is an ICAP client?
 -----------------------
 
@@ -30,7 +33,7 @@ Requirements
 ------------
 
 -  Python 3.X
--  the `C-ICAP`_ library, tested on versions 0.1.6, 0.3.4 and 0.3.5
+-  the `C-ICAP`_ library, (>= 0.4.x)
 -  GCC or clang
 
 Installation
