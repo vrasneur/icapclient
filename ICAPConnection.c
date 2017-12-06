@@ -263,14 +263,15 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
     char *url = "/";
     int timeout = ICAP_DEFAULT_TIMEOUT;
     int read_content = 1;
+    int allow_204 = 0;
     int input_fd = -1;
     ci_headers_list_t *req_headers = NULL;
     ci_headers_list_t *resp_headers = NULL;
 
-    static char *kwlist[] = { "type", "filename", "url", "service", "timeout", "read_content", NULL };
+    static char *kwlist[] = { "type", "filename", "url", "service", "timeout", "read_content", "allow_204", NULL };
 
-    if(!PyArg_ParseTupleAndKeywords(args, kwds, "ss|ssii:request", kwlist,
-                    &type, &filename, &url, &service, &timeout, &read_content))
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "ss|ssiip:request", kwlist,
+                    &type, &filename, &url, &service, &timeout, &read_content, &allow_204))
     {
         goto py_conn_request_error;
     }
@@ -324,7 +325,10 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
         goto py_conn_request_error;
     }
 
+    // Set req type
     conn->req->type = (strcmp(type, "REQMOD") == 0) ? ICAP_REQMOD : ICAP_RESPMOD;
+    // Configure 204 allow/disallow
+    conn->req->allow204 = allow_204;
 
     req_headers = py_conn_build_reqmod_http_headers(url);
     if(req_headers == NULL)
