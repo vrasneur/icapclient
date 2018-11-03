@@ -22,6 +22,10 @@ if not find_executable(api_config):
 
 extra_compile_args = ['-std=gnu99', '-Wextra']
 extra_compile_args.extend(check_output([api_config, '--cflags']).decode('utf-8').split())
+# ugly fix for issue #1. actual fix should probably be within cicap
+# -fPIE shouldn't be in the compile args
+if '-fPIE' in extra_compile_args:
+    extra_compile_args.remove('-fPIE')
 extra_link_args = check_output([api_config, '--libs']).decode('utf-8').split()
 
 ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 'ICAPResponse.c', 'cicap_compat.c'],
