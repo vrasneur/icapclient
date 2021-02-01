@@ -270,7 +270,7 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 
     static char *kwlist[] = { "type", "filename", "url", "service", "timeout", "read_content", "allow_204", NULL };
 
-    if(!PyArg_ParseTupleAndKeywords(args, kwds, "ss|ssiip:request", kwlist,
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "s|zssiip:request", kwlist,
                     &type, &filename, &url, &service, &timeout, &read_content, &allow_204))
     {
         goto py_conn_request_error;
@@ -290,11 +290,14 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
         goto py_conn_request_error;
     }
 
-    input_fd = open(filename, O_RDONLY);
-    if(input_fd < 0)
+    if(filename != NULL)
     {
-        PyErr_SetFromErrnoWithFilename(PyExc_IOError, filename);
-        goto py_conn_request_error;
+        input_fd = open(filename, O_RDONLY);
+        if(input_fd < 0)
+        {
+            PyErr_SetFromErrnoWithFilename(PyExc_IOError, filename);
+            goto py_conn_request_error;
+        }
     }
 
     // connect to the server if not already connected
@@ -359,7 +362,7 @@ py_conn_request(PyICAPConnection *conn, PyObject *args, PyObject *kwds)
 #else
                    req_headers, resp_headers,
 #endif
-                   &input_fd, py_conn_read,
+                  (input_fd > 0) ? &input_fd : NULL, py_conn_read,
                    conn->content, py_conn_write);
     Py_END_ALLOW_THREADS
     if(ret == CI_ERROR)
