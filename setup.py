@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- mode: python; coding: utf-8 -*-
 
-from distutils.core import setup, Extension
+from setuptools import setup
+from distutils.core import Extension
 from distutils.spawn import find_executable
 
 import os
@@ -33,7 +34,7 @@ ext = Extension(name='icapclient', sources=['icapclient.c', 'ICAPConnection.c', 
                 extra_link_args=extra_link_args)
 
 name_str = 'icapclient3'
-version_str = '1.1.1'
+version_str = '1.2.1'
 url_str = 'https://github.com/fim/%s' % name_str
 tarball_str = '%s/tarball/%s' % (url_str, version_str)
 
@@ -46,4 +47,5 @@ setup(name=name_str,
       url=url_str,
       download_url=tarball_str,
       keywords=['icap', 'antivirus'],
+      setup_requires=['wheel'],
       ext_modules=[ext])
